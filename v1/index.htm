@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Račun</title>
+    <meta charset="ISO-8859-2">
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="js/jquery-ui-1.10.4.custom.min.js"></script>
+    <link rel="stylesheet" href="css/smoothness/jquery-ui-1.10.4.custom.min.css">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var $c = $('#container');
+            var AddRows = function (count) {
+                for (var i = 0; i < count; i++) {
+                    AddRow();
+                }
+                return false;
+            }
+            var AddRow = function () {
+                var $row = $('<tr>' +
+                    '<td><input type="text" class="od"></td>' +
+                    '<td><input type="text" class="do"></td>' +
+                    '<td><input type="checkbox" class="ust"></td>' +
+                    '<td><a href="#" class="remove">Ukloni</a></td>' +
+                    '</tr>');
+
+                $row.find('.od, .do')
+                    .datepicker({
+                        dateFormat: 'dd.mm.yy',
+                        yearRange: '-100:+0',
+                        constrainInput: true,
+                        changeMonth: true,
+                        changeYear: true
+                    })
+                    .css('background', '#faa')
+                    .change(Calc);
+                $row.find('.ust')
+                    .change(Calc);
+
+                $row.find('.remove').click(function () {
+                    if ($c.find('tr').length <= 1) {
+                        $c.find('input:text').val('');
+                    }
+                    else {
+                        $row.remove();
+                    }
+                    Calc();
+                    return false;
+                });
+
+                $c.append($row);
+                return false;
+            };
+            var Datediff = function (d1, d2) {
+                var daysInMonth = function(month, year) { return new Date(year, month, 0).getDate(); }
+                var y = d2.getFullYear() - d1.getFullYear(),
+                    m = d2.getMonth() - d1.getMonth(),
+                    d = d2.getDate() - d1.getDate();
+                
+                if (d < 0) {
+                    m--;
+                    d = daysInMonth(d1.getFullYear(), d1.getMonth()) - d1.getDate() + 1 + d2.getDate();
+                }
+                else {
+                    d++;
+                }
+
+                if (m < 0) {
+                    y--;
+                    m = 12 + m;
+                }
+
+                return { y: y, m: m, d: d };
+            }
+            var Sum = function (a, b) {
+                a.y = (a.y || 0) + b.y;
+                a.m = (a.m || 0) + b.m;
+                a.d = (a.d || 0) + b.d;
+            }
+            var Round = function (a) {
+                if (a.d >= 30) {
+                    a.m += ~~(a.d / 30);
+                    a.d = ~~(a.d % 30);
+                }
+                if (a.m >= 12) {
+                    a.y += ~~(a.m / 12);
+                    a.m = ~~(a.m % 12);
+                }
+            }
+            var Calc = function () {
+                var uUst = { y: 0, m: 0, d: 0 }, izvanUst = { y: 0, m: 0, d: 0 };
+
+                $.each($c.find('tr'), function (idx, row) {
+                    var $row = $(row),
+                        d1 = $row.find('.od').datepicker('getDate'),
+                        d2 = $row.find('.do').datepicker('getDate'),
+                        d1v = d1 && d2 - d1 > 0,
+                        d2v = d2 && d2 - d1 > 0;
+
+                    $row.find('.od').css('background', d1v ? '#afa' : '#faa');
+                    $row.find('.do').css('background', d2v ? '#afa' : '#faa');
+
+                    if (d1v && d2v) {
+                        var ust = $row.find('.ust').is(':checked');
+                        Sum(ust ? uUst : izvanUst, Datediff(d1, d2));
+                    }
+                });
+
+
+                Round(uUst);
+                Round(izvanUst);
+
+                var ukupno = { y: uUst.y + izvanUst.y || 0, m: uUst.m + izvanUst.m || 0, d: uUst.d + izvanUst.d || 0 };
+                Round(ukupno);
+
+                $('#uust-y').text(uUst.y); $('#uust-m').text(uUst.m); $('#uust-d').text(uUst.d);
+                $('#izvanust-y').text(izvanUst.y); $('#izvanust-m').text(izvanUst.m); $('#izvanust-d').text(izvanUst.d);
+                $('#ukupno-y').text(ukupno.y || 0); $('#ukupno-m').text(ukupno.m || 0); $('#ukupno-d').text(ukupno.d || 0);
+            }
+
+
+            AddRows(3);
+            Calc();
+            $('#add-row').click(AddRow);
+            $('#add-rows').click(function () { return AddRows(3); });
+        });
+    </script>
+    <style type="text/css">
+        body {
+            font-family: Verdana;
+            font-size: 14px;
+        }
+        table {
+            border-collapse: collapse;
+            padding: 0;
+            margin: 0;
+        }
+        #input th {
+            background: #a00000;
+            color: #fff;
+            font-weight: bold;
+        }
+        #calc th {
+            background: #105d29;
+            color: #fff;
+            font-weight: bold;
+        }
+        #calc tbody td {
+            background: #a1ffc0;
+        }
+        #calc tbody tr:last-child td {
+            border-top: solid 1px #105d29;
+        }
+        td, th {
+            text-align: center;
+            padding: 5px;
+        }
+        #input tbody td {
+            background: #ffd2ac;
+        }
+        #input tbody tr:nth-child(odd) td {
+            background: #ffe6d1;
+        }
+
+        #input tfoot td {
+            text-align: left;
+        }
+        #input {
+            float: left;
+        }
+        #calc {
+            float: left;
+            margin-left: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #333;
+        }
+            a:hover {
+                text-decoration: underline;
+                color: #000;
+            }
+    </style>
+
+</head>
+<body>
+    <div id="input">
+        <table>
+            <thead>
+                <tr>
+                    <th>Od</th>
+                    <th>Do</th>
+                    <th>U ustanovi</th>
+                    <th>Opcije</th>
+                </tr>
+            </thead>
+            <tbody id="container"></tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4"><a href="#" id="add-row">Dodaj redak</a> | <a href="#" id="add-rows">Dodaj 3 retka</a></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div id="calc">
+        <table>
+            <colgroup>
+                <col style="width: 140px" />
+                <col style="width: 30px" />
+                <col style="width: 30px" />
+                <col style="width: 30px" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Vrsta</th>
+                    <th>Godina</th>
+                    <th>Mjeseci</th>
+                    <th>Dana</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>U ustanovi</td>
+                    <td><span id="uust-y">0</span></td>
+                    <td><span id="uust-m">0</span></td>
+                    <td><span id="uust-d">0</span></td>
+                </tr>
+                <tr>
+                    <td>Izvan ustanove</td>
+                    <td><span id="izvanust-y">0</span></td>
+                    <td><span id="izvanust-m">0</span></td>
+                    <td><span id="izvanust-d">0</span></td>
+                </tr>
+                <tr>
+                    <td>Ukupno</td>
+                    <td><span id="ukupno-y">0</span></td>
+                    <td><span id="ukupno-m">0</span></td>
+                    <td><span id="ukupno-d">0</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

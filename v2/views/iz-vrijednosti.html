@@ -1,0 +1,26 @@
+﻿<div>
+    <ol>
+        <li ng-repeat="item in items">
+            Godina:<input type="number" ng-model="item.y" ng-change="calculate()" />
+            Mjeseci:<input type="number" ng-model="item.m" ng-change="calculate()" />
+            Dana:<input type="number" ng-model="item.d" ng-change="calculate()" />
+            <label><input type="checkbox" ng-model="item.ustanova" ng-change="calculate()" />U ustanovi</label>
+            <button ng-click="remove($index)">Obriši</button>
+        </li>
+    </ol>
+    <button ng-click="add(5)">Dodaj 5 redaka</button>
+    <hr />
+
+    <div>
+        U ustanovi:
+        <strong>{{total.u.y}}</strong> godina,
+        <strong>{{total.u.m}}</strong> mjeseci,
+        <strong>{{total.u.d}}</strong> dana
+    </div>
+    <div>
+        Izvan ustanove:
+        <strong>{{total.izvan.y}}</strong> godina,
+        <strong>{{total.izvan.m}}</strong> mjeseci,
+        <strong>{{total.izvan.d}}</strong> dana
+    </div>
+</div>

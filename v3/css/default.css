@@ -1,0 +1,20 @@
+body {
+    font-family: Calibri;
+    font-size: 16px;
+}
+a {
+    text-decoration: none;
+}
+
+
+input[ng-model="item.sati"], input[ng-model="item.radnoVrijeme"], input[ng-model="item.d"], input[ng-model="item.m"], input[ng-model="item.y"] {
+    width: 40px;
+}
+
+li {
+    margin: 1px 0;
+}
+
+input {
+    margin: 0 2px;
+}

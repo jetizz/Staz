@@ -1,0 +1,12 @@
+body {
+    font-family: Calibri;
+    font-size: 16px;
+}
+a {
+    text-decoration: none;
+}
+
+
+input[ng-model="item.sati"], input[ng-model="item.d"], input[ng-model="item.m"], input[ng-model="item.y"] {
+    width: 40px;
+}
